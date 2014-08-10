@@ -17,16 +17,16 @@ Optimized FXAA shader for ThreeJS. This shader is compiled and versioned with [g
 
 ```js
 var THREE = require('three')
-var FXAA = require('three-shader-fxaa')()
+var fxaa = require('three-shader-fxaa')()
 
-var shader = new THREE.ShaderMaterial( FXAA ) 
+var shader = new THREE.ShaderMaterial( fxaa ) 
 shader.uniforms.tDiffuse.set = myTexture
 shader.uniforms.resolution.set(width, height)
 ```
 
 ```
 //... or with EffectComposer
-var pass = new THREE.ShaderPass(FXAA) 
+var pass = new THREE.ShaderPass(fxaa) 
 effectComposer.addPass( pass )
 pass.uniforms.tDiffuse.set = myTexture
 pass.uniforms.resolution.set(width, height)
