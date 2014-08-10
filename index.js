@@ -7,4 +7,6 @@ var source = glslify({
     sourceOnly: true
 })
 
-module.exports = createShader(source)
+module.exports = function() {
+    return createShader(source)
+}

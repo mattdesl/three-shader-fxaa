@@ -1,7 +1,6 @@
-var THREE = require('three')
-var fxaaShader = require('../')
+var FXAA = require('../')()
 
-var shader = new THREE.ShaderMaterial( fxaaShader ) 
+var shader = new THREE.ShaderMaterial( FXAA ) 
 
 console.log(shader)
 
