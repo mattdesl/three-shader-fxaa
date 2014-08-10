@@ -22,8 +22,9 @@ var FXAA = require('three-shader-fxaa')()
 var shader = new THREE.ShaderMaterial( FXAA ) 
 shader.uniforms.tDiffuse.set = myTexture
 shader.uniforms.resolution.set(width, height)
+```
 
-
+```
 //... or with EffectComposer
 var pass = new THREE.ShaderPass(FXAA) 
 effectComposer.addPass( pass )
