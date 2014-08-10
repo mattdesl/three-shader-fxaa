@@ -26,7 +26,7 @@ pass.uniforms.tDiffuse.set = myTexture
 pass.uniforms.resolution.set(width, height)
 ```
 
-Currently tested with THREE r68.
+Intended to be used with THREE on npm, tested with r68.
 
 ## Usage
 
