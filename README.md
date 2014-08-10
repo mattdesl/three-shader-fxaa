@@ -24,8 +24,8 @@ shader.uniforms.tDiffuse.set = myTexture
 shader.uniforms.resolution.set(width, height)
 ```
 
-```
-//... or with EffectComposer
+Or with effect composer:
+```js
 var pass = new THREE.ShaderPass(fxaa) 
 effectComposer.addPass( pass )
 pass.uniforms.tDiffuse.set = myTexture
