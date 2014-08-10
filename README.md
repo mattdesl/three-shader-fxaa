@@ -1,5 +1,3 @@
-[![browser support](https://ci.testling.com/mattdesl/three-shader-fxaa.png)](https://ci.testling.com/mattdesl/three-shader-fxaa)
-
 # three-shader-fxaa
 
 [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges)
