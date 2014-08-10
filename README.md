@@ -2,6 +2,11 @@
 
 [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges)
 
+
+[Demo](http://mattdesl.github.io/three-shader-fxaa/demo/static/)
+
+[![screen](http://i.imgur.com/Qsjt7z5.png)](http://mattdesl.github.io/three-shader-fxaa/demo/static/)
+
 Optimized FXAA shader for ThreeJS. This shader is compiled and versioned with [glslify](glslify), which means it can take advantage of some nice features like:
 
 - versioning; if [glsl-fxaa](https://www.npmjs.org/package/glsl-fxaa) is patched, users of [three-shader-fxaa](https://www.npmjs.org/package/three-shader-fxaa) will get the patch too
