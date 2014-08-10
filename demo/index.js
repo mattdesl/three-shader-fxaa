@@ -63,11 +63,16 @@ domready(function() {
         quad.material = useAA ? fxaaMaterial : stdMaterial
         renderer.render(postScene, ortho)
     }
-    
-    addEvent(window, 'click', function(ev) {
+
+    function click(ev) {
+        ev.preventDefault()
+        ev.stopPropagation()
         useAA = !useAA
         raf(render)
-    })
+    }
+    renderer.domElement.onselectstart = function () { return false; }
+    addEvent(renderer.domElement, 'click', click)
+    addEvent(renderer.domElement, 'touchdown', click)
 
     raf(render)
 

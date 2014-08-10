@@ -18,7 +18,8 @@
     "tape": "~2.13.2"
   },
   "scripts": {
-    "test": "tape test.js"
+    "test": "tape test.js",
+    "build": "browserify demo/index.js -o demo/static/bundle.js"
   },
   "testling": {
     "files": "test.js",
