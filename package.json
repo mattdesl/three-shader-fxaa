@@ -1,0 +1,64 @@
+{
+  "name": "three-shader-fxaa",
+  "version": "1.0.0",
+  "description": "optimized FXAA shader for ThreeJS",
+  "main": "index.js",
+  "license": "MIT",
+  "author": "Matt DesLauriers <dave.des@gmail.com>",
+  "dependencies": {
+    "glsl-fxaa": "^2.1.0",
+    "glslify": "^1.6.0",
+    "three": "^0.68.0",
+    "three-glslify": "^1.0.0"
+  },
+  "devDependencies": {
+    "add-event-listener": "0.0.1",
+    "domready": "^1.0.6",
+    "raf": "^2.0.2",
+    "tape": "~2.13.2"
+  },
+  "scripts": {
+    "test": "tape test.js"
+  },
+  "testling": {
+    "files": "test.js",
+    "browsers": [
+      "ie/6..latest",
+      "chrome/22..latest",
+      "firefox/16..latest",
+      "safari/latest",
+      "opera/11.0..latest",
+      "iphone/6",
+      "ipad/6",
+      "android-browser/latest"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mattdesl/three-shader-fxaa.git"
+  },
+  "homepage": "https://github.com/mattdesl/three-shader-fxaa",
+  "bugs": {
+    "url": "https://github.com/mattdesl/three-shader-fxaa/issues"
+  },
+  "keywords": [
+    "fxaa",
+    "glsl",
+    "webgl",
+    "threejs",
+    "three",
+    "anti",
+    "aliasing",
+    "anti-aliasing",
+    "alias",
+    "anti-alias",
+    "smooth",
+    "screen",
+    "space"
+  ],
+  "browserify": {
+    "transform": [
+      "glslify"
+    ]
+  }
+}
