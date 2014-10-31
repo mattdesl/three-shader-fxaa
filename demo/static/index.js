@@ -1,9 +1,97 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+// shim for using process in browser
+
+var process = module.exports = {};
+
+process.nextTick = (function () {
+    var canSetImmediate = typeof window !== 'undefined'
+    && window.setImmediate;
+    var canMutationObserver = typeof window !== 'undefined'
+    && window.MutationObserver;
+    var canPost = typeof window !== 'undefined'
+    && window.postMessage && window.addEventListener
+    ;
+
+    if (canSetImmediate) {
+        return function (f) { return window.setImmediate(f) };
+    }
+
+    var queue = [];
+
+    if (canMutationObserver) {
+        var hiddenDiv = document.createElement("div");
+        var observer = new MutationObserver(function () {
+            var queueList = queue.slice();
+            queue.length = 0;
+            queueList.forEach(function (fn) {
+                fn();
+            });
+        });
+
+        observer.observe(hiddenDiv, { attributes: true });
+
+        return function nextTick(fn) {
+            if (!queue.length) {
+                hiddenDiv.setAttribute('yes', 'no');
+            }
+            queue.push(fn);
+        };
+    }
+
+    if (canPost) {
+        window.addEventListener('message', function (ev) {
+            var source = ev.source;
+            if ((source === window || source === null) && ev.data === 'process-tick') {
+                ev.stopPropagation();
+                if (queue.length > 0) {
+                    var fn = queue.shift();
+                    fn();
+                }
+            }
+        }, true);
+
+        return function nextTick(fn) {
+            queue.push(fn);
+            window.postMessage('process-tick', '*');
+        };
+    }
+
+    return function nextTick(fn) {
+        setTimeout(fn, 0);
+    };
+})();
+
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+// TODO(shtylman)
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+
+},{}],2:[function(require,module,exports){
 var THREE = require('three')
 var domready = require('domready')
 var addEvent = require('add-event-listener')
 var raf = require('raf')
-var fxaa = require('../')()
+var fxaa = require('../')(THREE)
 
 domready(function() {
     var width = 512,
@@ -79,15 +167,16 @@ domready(function() {
 
     document.body.appendChild(renderer.domElement)
 })
-},{"../":2,"add-event-listener":3,"domready":4,"raf":7,"three":11}],2:[function(require,module,exports){
+},{"../":3,"add-event-listener":4,"domready":5,"raf":8,"three":12}],3:[function(require,module,exports){
 var glslify = require("glslify");
-var createShader = require("three-glslify");
+var threeify = require("three-glslify");
 var source = require("glslify/simple-adapter.js")("\n#define GLSLIFY 1\n\nvarying vec2 vUv;\nvarying vec2 v_rgbNW;\nvarying vec2 v_rgbNE;\nvarying vec2 v_rgbSW;\nvarying vec2 v_rgbSE;\nvarying vec2 v_rgbM;\nuniform vec2 resolution;\nvoid a_x_texcoords(vec2 fragCoord, vec2 resolution, out vec2 v_rgbNW, out vec2 v_rgbNE, out vec2 v_rgbSW, out vec2 v_rgbSE, out vec2 v_rgbM) {\n  vec2 inverseVP = 1.0 / resolution.xy;\n  v_rgbNW = (fragCoord + vec2(-1.0, -1.0)) * inverseVP;\n  v_rgbNE = (fragCoord + vec2(1.0, -1.0)) * inverseVP;\n  v_rgbSW = (fragCoord + vec2(-1.0, 1.0)) * inverseVP;\n  v_rgbSE = (fragCoord + vec2(1.0, 1.0)) * inverseVP;\n  v_rgbM = vec2(fragCoord * inverseVP);\n}\nvoid main() {\n  vUv = uv;\n  vec2 fragCoord = uv * resolution;\n  a_x_texcoords(fragCoord, resolution, v_rgbNW, v_rgbNE, v_rgbSW, v_rgbSE, v_rgbM);\n  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\n}", "\n#define GLSLIFY 1\n\nvarying vec2 vUv;\nvarying vec2 v_rgbNW;\nvarying vec2 v_rgbNE;\nvarying vec2 v_rgbSW;\nvarying vec2 v_rgbSE;\nvarying vec2 v_rgbM;\nuniform vec2 resolution;\nuniform sampler2D tDiffuse;\n#ifndef FXAA_REDUCE_MIN\n\n#define FXAA_REDUCE_MIN   (1.0/ 128.0)\n\n#endif\n\n#ifndef FXAA_REDUCE_MUL\n\n#define FXAA_REDUCE_MUL   (1.0 / 8.0)\n\n#endif\n\n#ifndef FXAA_SPAN_MAX\n\n#define FXAA_SPAN_MAX     8.0\n\n#endif\n\nvec4 a_x_fxaa(sampler2D tex, vec2 fragCoord, vec2 resolution, vec2 v_rgbNW, vec2 v_rgbNE, vec2 v_rgbSW, vec2 v_rgbSE, vec2 v_rgbM) {\n  vec4 color;\n  mediump vec2 inverseVP = vec2(1.0 / resolution.x, 1.0 / resolution.y);\n  vec3 rgbNW = texture2D(tex, v_rgbNW).xyz;\n  vec3 rgbNE = texture2D(tex, v_rgbNE).xyz;\n  vec3 rgbSW = texture2D(tex, v_rgbSW).xyz;\n  vec3 rgbSE = texture2D(tex, v_rgbSE).xyz;\n  vec4 texColor = texture2D(tex, v_rgbM);\n  vec3 rgbM = texColor.xyz;\n  vec3 luma = vec3(0.299, 0.587, 0.114);\n  float lumaNW = dot(rgbNW, luma);\n  float lumaNE = dot(rgbNE, luma);\n  float lumaSW = dot(rgbSW, luma);\n  float lumaSE = dot(rgbSE, luma);\n  float lumaM = dot(rgbM, luma);\n  float lumaMin = min(lumaM, min(min(lumaNW, lumaNE), min(lumaSW, lumaSE)));\n  float lumaMax = max(lumaM, max(max(lumaNW, lumaNE), max(lumaSW, lumaSE)));\n  mediump vec2 dir;\n  dir.x = -((lumaNW + lumaNE) - (lumaSW + lumaSE));\n  dir.y = ((lumaNW + lumaSW) - (lumaNE + lumaSE));\n  float dirReduce = max((lumaNW + lumaNE + lumaSW + lumaSE) * (0.25 * FXAA_REDUCE_MUL), FXAA_REDUCE_MIN);\n  float rcpDirMin = 1.0 / (min(abs(dir.x), abs(dir.y)) + dirReduce);\n  dir = min(vec2(FXAA_SPAN_MAX, FXAA_SPAN_MAX), max(vec2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX), dir * rcpDirMin)) * inverseVP;\n  vec3 rgbA = 0.5 * (texture2D(tex, fragCoord * inverseVP + dir * (1.0 / 3.0 - 0.5)).xyz + texture2D(tex, fragCoord * inverseVP + dir * (2.0 / 3.0 - 0.5)).xyz);\n  vec3 rgbB = rgbA * 0.5 + 0.25 * (texture2D(tex, fragCoord * inverseVP + dir * -0.5).xyz + texture2D(tex, fragCoord * inverseVP + dir * 0.5).xyz);\n  float lumaB = dot(rgbB, luma);\n  if((lumaB < lumaMin) || (lumaB > lumaMax))\n    color = vec4(rgbA, texColor.a);\n  else\n    color = vec4(rgbB, texColor.a);\n  return color;\n}\nvoid main() {\n  vec2 fragCoord = vUv * resolution;\n  gl_FragColor = a_x_fxaa(tDiffuse, fragCoord, resolution, v_rgbNW, v_rgbNE, v_rgbSW, v_rgbSE, v_rgbM);\n}", [{"name":"resolution","type":"vec2"},{"name":"resolution","type":"vec2"},{"name":"tDiffuse","type":"sampler2D"}], []);
 
-module.exports = function() {
+module.exports = function(THREE) {
+    var createShader = threeify(THREE);
     return createShader(source);
 };
-},{"glslify":5,"glslify/simple-adapter.js":6,"three-glslify":9}],3:[function(require,module,exports){
+},{"glslify":6,"glslify/simple-adapter.js":7,"three-glslify":10}],4:[function(require,module,exports){
 addEventListener.removeEventListener = removeEventListener
 addEventListener.addEventListener = addEventListener
 
@@ -135,7 +224,7 @@ function oldIEDetach(el, eventName, listener, useCapture) {
   el.detachEvent('on' + eventName, listener)
 }
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 /*!
   * domready (c) Dustin Diaz 2014 - License MIT
   */
@@ -165,7 +254,7 @@ function oldIEDetach(el, eventName, listener, useCapture) {
 
 });
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 module.exports = noop
 
 function noop() {
@@ -175,7 +264,7 @@ function noop() {
   )
 }
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 module.exports = programify
 
 function programify(vertex, fragment, uniforms, attributes) {
@@ -187,7 +276,7 @@ function programify(vertex, fragment, uniforms, attributes) {
   };
 }
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 var now = require('performance-now')
   , global = typeof window === 'undefined' ? {} : window
   , vendors = ['moz', 'webkit']
@@ -269,7 +358,7 @@ module.exports.cancel = function() {
   caf.apply(global, arguments)
 }
 
-},{"performance-now":8}],8:[function(require,module,exports){
+},{"performance-now":9}],9:[function(require,module,exports){
 (function (process){
 // Generated by CoffeeScript 1.6.3
 (function() {
@@ -309,33 +398,37 @@ module.exports.cancel = function() {
 */
 
 }).call(this,require('_process'))
-},{"_process":12}],9:[function(require,module,exports){
-var types = require('./types')
+},{"_process":1}],10:[function(require,module,exports){
+var createTypes = require('./types')
 
-module.exports = function(glShader, opts) {
-    opts = opts||{}
 
-    if (typeof opts.colors === 'string')
-        opts.colors = [opts.colors]
-    
-    var tUniforms = types( glShader.uniforms, opts.colors )
-    var tAttribs = types( glShader.attributes, opts.colors )
+module.exports = function(THREE) {
+
+    var types = createTypes(THREE) 
+
+    return function create(glShader, opts) {
+        opts = opts||{}
+
+        if (typeof opts.colors === 'string')
+            opts.colors = [opts.colors]
         
-    //clear the attribute arrays
-    for (var k in tAttribs) {
-        tAttribs[k].value = []
-    }
+        var tUniforms = types( glShader.uniforms, opts.colors )
+        var tAttribs = types( glShader.attributes, opts.colors )
+            
+        //clear the attribute arrays
+        for (var k in tAttribs) {
+            tAttribs[k].value = []
+        }
 
-    return {
-        vertexShader: glShader.vertex,
-        fragmentShader: glShader.fragment,
-        uniforms: tUniforms,
-        attributes: tAttribs
+        return {
+            vertexShader: glShader.vertex,
+            fragmentShader: glShader.fragment,
+            uniforms: tUniforms,
+            attributes: tAttribs
+        }
     }
 }
-},{"./types":10}],10:[function(require,module,exports){
-var THREE = require('three')
-
+},{"./types":11}],11:[function(require,module,exports){
 var typeMap = {
     'int': 'i',
     'float': 'f',
@@ -351,109 +444,111 @@ var typeMap = {
     'samplerCube': 't'
 }
 
-function newInstance(type, isArray) {
-    switch (type) {
-        case 'float': 
-        case 'int':
-            return 0
-        case 'vec2':
-        case 'ivec2':
-            return new THREE.Vector2()
-        case 'vec3':
-        case 'ivec3':
-            return new THREE.Vector3()
-        case 'vec4':
-        case 'ivec4':
-            return new THREE.Vector4()
-        case 'mat4':
-            return new THREE.Matrix4()
-        case 'mat3':
-            return new THREE.Matrix3()
-        case 'samplerCube':
-        case 'sampler2D':
-            return new THREE.Texture()
-        default:
-            return undefined
-    }
-}
-
-function defaultValue(type, isArray, arrayLen) {
-    if (isArray) {
-        //ThreeJS flattens ivec3 type
-        //(we don't support 'fv' type)
-        if (type === 'ivec3')
-            arrayLen *= 3
-        var ar = new Array(arrayLen)
-        for (var i=0; i<ar.length; i++)
-            ar[i] = newInstance(type, isArray)
-        return ar
-    }  
-    return newInstance(type)
-}
-
-function getType(type, isArray) {
-    if (!isArray)
-        return typeMap[type]
-
-    if (type === 'int')
-        return 'iv1'
-    else if (type === 'float')
-        return 'fv1'
-    else
-        return typeMap[type]+'v'
-}
-
-function setupUniforms(glUniforms, colorNames) {
-    if (!Array.isArray(colorNames))
-        colorNames = Array.prototype.slice.call(arguments, 1)
-
-    var result = {}
-    var arrays = {}
-
-    //map uniform types
-    glUniforms.forEach(function(uniform) {
-        var name = uniform.name
-        var isArray = /(.+)\[[0-9]+\]/.exec(name)
-
-        //special case: colors...
-        if (colorNames && colorNames.indexOf(name) !== -1) {
-            if (isArray)
-                throw new Error("array of color uniforms not supported")
-            if (uniform.type !== 'vec3')
-                throw new Error("ThreeJS expects vec3 for Color uniforms") 
-            result[name] = {
-                type: 'c',
-                value: new THREE.Color()
-            }
-            return
+function create(THREE) {
+    function newInstance(type, isArray) {
+        switch (type) {
+            case 'float': 
+            case 'int':
+                return 0
+            case 'vec2':
+            case 'ivec2':
+                return new THREE.Vector2()
+            case 'vec3':
+            case 'ivec3':
+                return new THREE.Vector3()
+            case 'vec4':
+            case 'ivec4':
+                return new THREE.Vector4()
+            case 'mat4':
+                return new THREE.Matrix4()
+            case 'mat3':
+                return new THREE.Matrix3()
+            case 'samplerCube':
+            case 'sampler2D':
+                return new THREE.Texture()
+            default:
+                return undefined
         }
+    }
 
+    function defaultValue(type, isArray, arrayLen) {
         if (isArray) {
-            name = isArray[1]
-            if (name in arrays) 
-                arrays[name].count++ 
-            else
-                arrays[name] = { count: 1, type: uniform.type }
-        }
-        result[name] = { 
-            type: getType(uniform.type, isArray), 
-            value: isArray ? null : defaultValue(uniform.type) 
-        }
-    })
-
-    //now clean up any array values
-    for (var k in result) {
-        var u = result[k]
-        if (k in arrays) { //is an array
-            var a = arrays[k]
-            u.value = defaultValue(a.type, true, a.count)
-        }
+            //ThreeJS flattens ivec3 type
+            //(we don't support 'fv' type)
+            if (type === 'ivec3')
+                arrayLen *= 3
+            var ar = new Array(arrayLen)
+            for (var i=0; i<ar.length; i++)
+                ar[i] = newInstance(type, isArray)
+            return ar
+        }  
+        return newInstance(type)
     }
-    return result
+
+    function getType(type, isArray) {
+        if (!isArray)
+            return typeMap[type]
+
+        if (type === 'int')
+            return 'iv1'
+        else if (type === 'float')
+            return 'fv1'
+        else
+            return typeMap[type]+'v'
+    }
+
+    return function setupUniforms(glUniforms, colorNames) {
+        if (!Array.isArray(colorNames))
+            colorNames = Array.prototype.slice.call(arguments, 1)
+
+        var result = {}
+        var arrays = {}
+
+        //map uniform types
+        glUniforms.forEach(function(uniform) {
+            var name = uniform.name
+            var isArray = /(.+)\[[0-9]+\]/.exec(name)
+
+            //special case: colors...
+            if (colorNames && colorNames.indexOf(name) !== -1) {
+                if (isArray)
+                    throw new Error("array of color uniforms not supported")
+                if (uniform.type !== 'vec3')
+                    throw new Error("ThreeJS expects vec3 for Color uniforms") 
+                result[name] = {
+                    type: 'c',
+                    value: new THREE.Color()
+                }
+                return
+            }
+
+            if (isArray) {
+                name = isArray[1]
+                if (name in arrays) 
+                    arrays[name].count++ 
+                else
+                    arrays[name] = { count: 1, type: uniform.type }
+            }
+            result[name] = { 
+                type: getType(uniform.type, isArray), 
+                value: isArray ? null : defaultValue(uniform.type) 
+            }
+        })
+
+        //now clean up any array values
+        for (var k in result) {
+            var u = result[k]
+            if (k in arrays) { //is an array
+                var a = arrays[k]
+                u.value = defaultValue(a.type, true, a.count)
+            }
+        }
+        return result
+    }
 }
 
-module.exports = setupUniforms
-},{"three":11}],11:[function(require,module,exports){
+module.exports = create
+},{}],12:[function(require,module,exports){
 var self = self || {};// File:src/Three.js
 
 /**
@@ -36310,69 +36405,4 @@ if (typeof exports !== 'undefined') {
   this['THREE'] = THREE;
 }
 
-},{}],12:[function(require,module,exports){
-// shim for using process in browser
-
-var process = module.exports = {};
-
-process.nextTick = (function () {
-    var canSetImmediate = typeof window !== 'undefined'
-    && window.setImmediate;
-    var canPost = typeof window !== 'undefined'
-    && window.postMessage && window.addEventListener
-    ;
-
-    if (canSetImmediate) {
-        return function (f) { return window.setImmediate(f) };
-    }
-
-    if (canPost) {
-        var queue = [];
-        window.addEventListener('message', function (ev) {
-            var source = ev.source;
-            if ((source === window || source === null) && ev.data === 'process-tick') {
-                ev.stopPropagation();
-                if (queue.length > 0) {
-                    var fn = queue.shift();
-                    fn();
-                }
-            }
-        }, true);
-
-        return function nextTick(fn) {
-            queue.push(fn);
-            window.postMessage('process-tick', '*');
-        };
-    }
-
-    return function nextTick(fn) {
-        setTimeout(fn, 0);
-    };
-})();
-
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-}
-
-// TODO(shtylman)
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-
-},{}]},{},[1]);
+},{}]},{},[2]);

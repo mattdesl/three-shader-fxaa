@@ -1,4 +1,4 @@
-var FXAA = require('../')()
+var FXAA = require('../')(THREE)
 
 var shader = new THREE.ShaderMaterial( FXAA ) 
 

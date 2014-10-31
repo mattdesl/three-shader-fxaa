@@ -2,7 +2,7 @@ var THREE = require('three')
 var domready = require('domready')
 var addEvent = require('add-event-listener')
 var raf = require('raf')
-var fxaa = require('../')()
+var fxaa = require('../')(THREE)
 
 domready(function() {
     var width = 512,

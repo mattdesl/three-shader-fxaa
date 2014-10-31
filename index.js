@@ -1,5 +1,5 @@
 var glslify = require('glslify')
-var createShader = require('three-glslify')
+var threeify = require('three-glslify')
 
 var source = glslify({
     vertex: './vert.glsl',
@@ -7,6 +7,7 @@ var source = glslify({
     sourceOnly: true
 })
 
-module.exports = function() {
+module.exports = function(THREE) {
+    var createShader = threeify(THREE)
     return createShader(source)
 }

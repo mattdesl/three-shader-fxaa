@@ -9,7 +9,7 @@
     "glsl-fxaa": "^2.1.0",
     "glslify": "^1.6.0",
     "three": "0.68.x",
-    "three-glslify": "^1.0.0"
+    "three-glslify": "^2.0.1"
   },
   "devDependencies": {
     "add-event-listener": "0.0.1",
