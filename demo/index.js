@@ -44,7 +44,7 @@ domready(function() {
     var stdMaterial = new THREE.MeshBasicMaterial({ map:target })
 
     //this is our FXAA pass
-    var fxaaMaterial = new THREE.ShaderMaterial(fxaa)
+    var fxaaMaterial = new THREE.ShaderMaterial(fxaa())
     fxaaMaterial.uniforms.tDiffuse.value = target
     fxaaMaterial.uniforms.resolution.value.set(width, height)
 

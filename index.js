@@ -9,5 +9,7 @@ var source = glslify({
 
 module.exports = function(THREE) {
     var createShader = threeify(THREE)
-    return createShader(source)
+    return function() {
+        return createShader(source)
+    }
 }
