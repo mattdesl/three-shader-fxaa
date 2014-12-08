@@ -1,11 +1,13 @@
-var glslify = require('glslify')
+// var glslify = require('glslify')
 var threeify = require('three-glslify')
 
-var source = glslify({
-    vertex: './vert.glsl',
-    fragment: './frag.glsl',
-    sourceOnly: true
-})
+// var source = glslify({
+//     vertex: './vert.glsl',
+//     fragment: './frag.glsl',
+//     sourceOnly: true
+// })
+
+var source = require('./compiled')
 
 module.exports = function(THREE) {
     var createShader = threeify(THREE)
