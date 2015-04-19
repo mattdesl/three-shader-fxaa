@@ -2,7 +2,6 @@
 
 [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges)
 
-
 [Demo](http://mattdesl.github.io/three-shader-fxaa/demo/static/)
 
 [![screen](http://i.imgur.com/Qsjt7z5.png)](http://mattdesl.github.io/three-shader-fxaa/demo/static/)
@@ -14,7 +13,6 @@ Optimized FXAA shader for ThreeJS. This shader is compiled and versioned with [g
 - robust shader code that is easy to re-use and share across projects
 - [and more...](http://mattdesl.svbtle.com/glslify)
 
-
 ```js
 var THREE = require('three')
 var fxaa = require('three-shader-fxaa')(THREE)
@@ -25,6 +23,7 @@ shader.uniforms.resolution.set(width, height)
 ```
 
 Or with effect composer:
+
 ```js
 var pass = new THREE.ShaderPass( fxaa() ) 
 effectComposer.addPass( pass )
@@ -49,7 +48,7 @@ Calling the function returns a new object with the following properties. This ca
 	uniforms: { 
 		tDiffuse: { type: 't', value: new THREE.Texture() },
 		resolution: { type: 'v2', value: new THREE.Vector2() }
-    }
+  }
 }
 ```
 

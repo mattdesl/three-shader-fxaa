@@ -7,18 +7,20 @@
   "author": "Matt DesLauriers <dave.des@gmail.com>",
   "dependencies": {
     "glsl-fxaa": "^2.1.0",
-    "glslify": "^1.6.0",
-    "three": "0.68.x",
-    "three-glslify": "^2.0.1"
+    "glslify": "^2.1.2"
   },
   "devDependencies": {
+    "three": "0.68.x",
     "add-event-listener": "0.0.1",
+    "budo": "^3.1.0",
     "domready": "^1.0.6",
+    "garnish": "^2.1.3",
     "raf": "^2.0.2",
-    "tape": "~2.13.2"
+    "tape": "~2.13.2",
+    "watchify": "^3.1.1"
   },
   "scripts": {
-    "test": "tape test.js",
+    "start": "budo demo/index.js:static/index.js --dir demo -v --live -t glslify | garnish",
     "build": "browserify demo/index.js -o demo/static/index.js"
   },
   "testling": {

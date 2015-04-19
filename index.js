@@ -1,15 +1,17 @@
 var glslify = require('glslify')
-var threeify = require('three-glslify')
 
-var source = glslify({
-    vertex: './vert.glsl',
-    fragment: './frag.glsl',
-    sourceOnly: true
-})
+var vert = glslify('./vert.glsl')
+var frag = glslify('./frag.glsl')
 
 module.exports = function(THREE) {
-    var createShader = threeify(THREE)
-    return function() {
-        return createShader(source)
+  return function() {
+    return {
+      uniforms: { 
+        tDiffuse: { type: 't', value: new THREE.Texture() },
+        resolution: { type: 'v2', value: new THREE.Vector2() }
+      },
+      vertexShader: vert,
+      fragmentShader: frag
     }
+  }
 }
