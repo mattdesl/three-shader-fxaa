@@ -1,6 +1,6 @@
 # three-shader-fxaa
 
-[![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges)
+[![stable](http://badges.github.io/stability-badges/dist/stable.svg)](http://github.com/badges/stability-badges)
 
 [Demo](http://mattdesl.github.io/three-shader-fxaa/)
 
