@@ -1,5 +1,4 @@
 global.THREE = require('three')
-var createOrbitViewer = require('three-orbit-viewer')(THREE)
 var EffectComposer = require('three-effectcomposer')(THREE)
 var fxaa = require('./')
 
@@ -26,7 +25,7 @@ var camera = new THREE.PerspectiveCamera(50, width / height, 0.01, 1000)
 camera.position.copy(new THREE.Vector3(3, 2, -2))
 camera.lookAt(new THREE.Vector3())
 
-var geo = new THREE.BoxGeometry(1,1,1)
+var geo = new THREE.BoxGeometry(1, 1, 1)
 var mat = new THREE.MeshBasicMaterial({ color: 0xffffff })
 var box = new THREE.Mesh(geo, mat)
 scene.add(box)

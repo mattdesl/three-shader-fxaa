@@ -2,55 +2,73 @@
 
 [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges)
 
-[Demo](http://mattdesl.github.io/three-shader-fxaa/demo/static/)
+[Demo](http://mattdesl.github.io/three-shader-fxaa/)
 
-[![screen](http://i.imgur.com/Qsjt7z5.png)](http://mattdesl.github.io/three-shader-fxaa/demo/static/)
+Optimized FXAA shader for ThreeJS, passing some texture coordinates from the vertex shader to avoid 5 dependent texture reads. This is well suited for PowerVR GPUs (iOS).
 
-Optimized FXAA shader for ThreeJS. This shader is compiled and versioned with [glslify](glslify), which means it can take advantage of some nice features like:
+[![screen](http://i.imgur.com/Qsjt7z5.png)](http://mattdesl.github.io/three-shader-fxaa/)
 
-- versioning; if [glsl-fxaa](https://www.npmjs.org/package/glsl-fxaa) is patched, users of [three-shader-fxaa](https://www.npmjs.org/package/three-shader-fxaa) will get the patch too
-- glslify transforms, like optimizing and minifying during your application bundle step
-- robust shader code that is easy to re-use and share across projects
-- [and more...](http://mattdesl.svbtle.com/glslify)
+This module is intended to be consumed with browserify, as it relies on [glslify](https://github.com/stackgl/glslify) to bring in shader components from npm. At a later point, it may be transpiled with a babel plugin, for use in Webpack/JSPM/etc.
 
-```js
-var THREE = require('three')
-var fxaa = require('three-shader-fxaa')(THREE)
+Tested on Three r69-73, works with the [three](http://npmjs.com/package/three) module.
 
-var shader = new THREE.ShaderMaterial( fxaa() ) 
-shader.uniforms.tDiffuse.set = myTexture
-shader.uniforms.resolution.set(width, height)
+## Install
+
+```sh
+npm install three-shader-fxaa --save
 ```
 
-Or with effect composer:
+## Usage
+
+This is typically used with EffectComposer, like so:
 
 ```js
-var pass = new THREE.ShaderPass( fxaa() ) 
-effectComposer.addPass( pass )
-pass.uniforms.tDiffuse.set = myTexture
-pass.uniforms.resolution.set(width, height)
+// Make sure THREE is in global if not already
+window.THREE = require('three')
+
+// Grab EffectComposer from npm or ThreeJS examples
+var EffectComposer = require('three-effectcomposer')(THREE)
+
+// Setup bare-bones composer
+var effectComposer = new EffectComposer(renderer)
+composer.addPass(new EffectComposer.RenderPass(scene, camera))
+
+// Add FXAA pass
+var shaderPass = new EffectComposer.ShaderPass(fxaa())
+shaderPass.renderToScreen = true
+composer.addPass(shaderPass)
+
+// Make sure screen resolution is set!
+shaderPass.uniforms.resolution.set(width, height)
+
+// Render scene
+composer.render()
 ```
 
-Intended to be used with THREE on npm, tested with r68.
+You don't need to set up `glslify` since that will be done by browserify under the hood.
 
 ## Usage
 
 [![NPM](https://nodei.co/npm/three-shader-fxaa.png)](https://nodei.co/npm/three-shader-fxaa/)
 
-### ```fxaa()```
+### ```shader = fxaa([opt])```
 
-Calling the function returns a new object with the following properties. This can be piped into THREE.ShaderMaterial or THREE.EffectComposer.
+Calling the function returns a new object with the following properties. This can be piped into `THREE.ShaderMaterial` or `THREE.EffectComposer`.
 
 ```js
 {
-	vertexShader: '...shader source...',
-	fragmentShader: '...shader source...',
-	uniforms: { 
-		tDiffuse: { type: 't', value: new THREE.Texture() },
-		resolution: { type: 'v2', value: new THREE.Vector2() }
+  vertexShader: '...shader source...',
+  fragmentShader: '...shader source...',
+  uniforms: { 
+    tDiffuse: { type: 't', value: new THREE.Texture() },
+    resolution: { type: 'v2', value: new THREE.Vector2() }
   }
 }
 ```
+
+You can specify the following option:
+
+- `opt.resolution` which is a default `THREE.Vector2` to use
 
 ## License
 
