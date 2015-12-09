@@ -29,6 +29,9 @@ window.THREE = require('three')
 // Grab EffectComposer from npm or ThreeJS examples
 var EffectComposer = require('three-effectcomposer')(THREE)
 
+// Grab this module!
+var fxaa = require('three-shader-fxaa')
+
 // Setup bare-bones composer
 var effectComposer = new EffectComposer(renderer)
 composer.addPass(new EffectComposer.RenderPass(scene, camera))
