@@ -7,34 +7,28 @@
   "author": "Matt DesLauriers <dave.des@gmail.com>",
   "dependencies": {
     "glsl-fxaa": "^2.1.0",
-    "glslify": "^2.1.2"
+    "glslify": "^4.0.0",
+    "three-effectcomposer": "0.0.1"
   },
   "devDependencies": {
-    "three": "0.68.x",
     "add-event-listener": "0.0.1",
-    "budo": "^3.1.0",
+    "browserify": "^12.0.1",
+    "budo": "^7.0.2",
     "domready": "^1.0.6",
     "garnish": "^2.1.3",
     "raf": "^2.0.2",
+    "standard": "^5.4.1",
     "tape": "~2.13.2",
+    "three": "^0.73.0",
+    "three-effectcomposer": "0.0.1",
+    "three-orbit-viewer": "^69.3.0",
+    "uglify-js": "^2.6.1",
     "watchify": "^3.1.1"
   },
   "scripts": {
-    "start": "budo demo/index.js:static/index.js --dir demo -v --live -t glslify | garnish",
-    "build": "browserify demo/index.js -o demo/static/index.js"
-  },
-  "testling": {
-    "files": "test.js",
-    "browsers": [
-      "ie/6..latest",
-      "chrome/22..latest",
-      "firefox/16..latest",
-      "safari/latest",
-      "opera/11.0..latest",
-      "iphone/6",
-      "ipad/6",
-      "android-browser/latest"
-    ]
+    "start": "budo demo.js:bundle.js --live",
+    "build": "browserify demo.js | uglifyjs -cm > bundle.js",
+    "test": "standard"
   },
   "repository": {
     "type": "git",
