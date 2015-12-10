@@ -6,9 +6,8 @@
   "license": "MIT",
   "author": "Matt DesLauriers <dave.des@gmail.com>",
   "dependencies": {
-    "glsl-fxaa": "^2.1.0",
-    "glslify": "^4.0.0",
-    "three-effectcomposer": "0.0.1"
+    "glsl-fxaa": "^3.0.0",
+    "glslify": "^4.0.0"
   },
   "standard": {
     "globals": [
