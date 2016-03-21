@@ -5,16 +5,15 @@
   "main": "./build/index.js",
   "license": "MIT",
   "author": "Matt DesLauriers <dave.des@gmail.com>",
-  "dependencies": {
-    "glsl-fxaa": "^3.0.0",
-    "glslify": "^4.0.0"
-  },
+  "dependencies": {},
   "standard": {
     "globals": [
       "THREE"
     ]
   },
   "devDependencies": {
+    "glsl-fxaa": "^3.0.0",
+    "glslify": "^4.0.0",
     "browserify": "^12.0.1",
     "budo": "^7.0.2",
     "npm-run-all": "^1.6.0",
