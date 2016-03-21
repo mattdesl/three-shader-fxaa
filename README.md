@@ -46,8 +46,6 @@ shaderPass.uniforms.resolution.set(width, height)
 composer.render()
 ```
 
-You don't need to set up `glslify` since that will be done by browserify under the hood.
-
 ## Usage
 
 [![NPM](https://nodei.co/npm/three-shader-fxaa.png)](https://nodei.co/npm/three-shader-fxaa/)
@@ -70,6 +68,34 @@ Calling the function returns a new object with the following properties. This ca
 You can specify the following option:
 
 - `opt.resolution` which is a default `THREE.Vector2` to use
+
+## From Source
+
+To build/run from source, first `git clone` this repo and then:
+
+```sh
+npm install
+```
+
+Once installed, you can test/build the demo like this:
+
+```sh
+# to run demo dev server/scripts
+npm run start
+
+# to run demo build scripts
+npm run build
+```
+
+Or, you can test/build the source code. It needs to be transpiled with `glslify` so that the final npm distribution has its source inlined.
+
+```sh
+# watch index and shaders and transpile on change
+npm run dev
+
+# transpile index and shaders to build/ folder
+npm run transpile
+```
 
 ## License
 
