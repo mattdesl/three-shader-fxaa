@@ -8,8 +8,6 @@ Optimized FXAA shader for ThreeJS, passing some texture coordinates from the ver
 
 [![screen](http://i.imgur.com/Qsjt7z5.png)](http://mattdesl.github.io/three-shader-fxaa/)
 
-This module is intended to be consumed with browserify, as it relies on [glslify](https://github.com/stackgl/glslify) to bring in shader components from npm. At a later point, it may be transpiled with a babel plugin, for use in Webpack/JSPM/etc.
-
 Tested on Three r69-73, works with the [three](http://npmjs.com/package/three) module.
 
 ## Install

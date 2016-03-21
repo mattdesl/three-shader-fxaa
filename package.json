@@ -2,7 +2,7 @@
   "name": "three-shader-fxaa",
   "version": "5.0.2",
   "description": "optimized FXAA shader for ThreeJS",
-  "main": "index.js",
+  "main": "./build/index.js",
   "license": "MIT",
   "author": "Matt DesLauriers <dave.des@gmail.com>",
   "dependencies": {
@@ -17,14 +17,21 @@
   "devDependencies": {
     "browserify": "^12.0.1",
     "budo": "^7.0.2",
+    "npm-run-all": "^1.6.0",
+    "onchange": "^2.1.2",
     "standard": "^5.4.1",
     "three": "^0.73.0",
     "three-effectcomposer": "0.0.1",
+    "transpilify": "^2.0.0",
     "uglify-js": "^2.6.1"
   },
   "scripts": {
-    "start": "budo demo.js:bundle.js --live",
+    "start": "npm-run-all --parallel watch dev",
+    "watch": "onchange 'index.js' '*.glsl' -- npm run transpile",
+    "dev": "budo demo.js:bundle.js --live",
     "build": "browserify demo.js | uglifyjs -cm > bundle.js",
+    "transpile": "transpilify index.js --out-file build/index.js -t glslify",
+    "prepublish": "npm run transpile",
     "test": "standard"
   },
   "repository": {
@@ -49,10 +56,5 @@
     "smooth",
     "screen",
     "space"
-  ],
-  "browserify": {
-    "transform": [
-      "glslify"
-    ]
-  }
+  ]
 }
