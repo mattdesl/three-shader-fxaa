@@ -1,6 +1,6 @@
 {
   "name": "three-shader-fxaa",
-  "version": "5.0.2",
+  "version": "5.1.0",
   "description": "optimized FXAA shader for ThreeJS",
   "main": "./build/index.js",
   "license": "MIT",
