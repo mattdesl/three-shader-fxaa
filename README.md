@@ -8,7 +8,7 @@ Optimized FXAA shader for ThreeJS, passing some texture coordinates from the ver
 
 [![screen](http://i.imgur.com/Qsjt7z5.png)](http://mattdesl.github.io/three-shader-fxaa/)
 
-Tested on Three r69-73, works with the [three](http://npmjs.com/package/three) module.
+Tested on Three r69-78, works with the [three](http://npmjs.com/package/three) module.
 
 ## Install
 
@@ -40,7 +40,7 @@ shaderPass.renderToScreen = true
 composer.addPass(shaderPass)
 
 // Make sure screen resolution is set!
-shaderPass.uniforms.resolution.set(width, height)
+shaderPass.uniforms.resolution.value.set(width, height)
 
 // Render scene
 composer.render()
